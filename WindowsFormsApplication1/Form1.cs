@@ -6,6 +6,9 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.Security.Permissions;
 using System.IO;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
 //using map;
 
 
@@ -24,6 +27,9 @@ namespace WindowsFormsApplication1
             //webBrowser1.ScriptErrorsSuppressed = false;
 
         }
+
+        public List<BlogNew> blogNews { get; set; }
+        public BindingList<BlogNew> blogNewsRegardUI { get; set; }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -259,7 +265,7 @@ namespace WindowsFormsApplication1
 
         private double f(double x)
         {
-            return Math.Pow(x, 2);//此处写待积分方程
+            return Math.Pow(x, 2)+Math.Log(x);//此处写待积分方程
         }
 
         private decimal CalArea(double x,double y)

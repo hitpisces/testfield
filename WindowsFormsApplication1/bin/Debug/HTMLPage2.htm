@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+body, html{width: 100%;height: 100%;overflow: hidden;margin:0;}
+#allmap {margin-right: 0px;height: 100%;overflow: hidden;}
+#result {border-left:1px dotted #999;height:100%;width:295px;position:absolute;top:0px;right:0px;font-size:12px;}
+dl,dt,dd,ul,li{
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+dt{
+    font-size:14px;
+    font-family:"微软雅黑";
+    font-weight:bold;
+    border-bottom:1px dotted #000;
+    padding:5px 0 5px 5px;
+    margin:5px 0;
+}
+dd{
+    padding:5px 0 0 5px;
+}
+li{
+    line-height:28px;
+}
+</style>
+<script src="jquery-1.4.1.js" type="text/javascript"></script>
+<script src="jquery.blockUI.js" type="text/javascript"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=1.5&ak=GwCchharGQCdel7GubNAAmAW"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
+<link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css" />
+
+<title>SearchInfoWindow</title>
+</head>
+<body>
+<div id="allmap" style="overflow:hidden;zoom:1;position:relative;">	
+    <div id="map" style="height:100%;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;"></div>
+    <div id="showPanelBtn" style="position:absolute;font-size:14px;top:50%;margin-top:-95px;right:0px;width:20px;padding:10px 10px;color:#999;cursor:pointer;text-align:center;height:170px;background:rgba(255,255,255,0.9);-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;font-family:'微软雅黑';font-weight:bold;">显示检索结果面板<br/>&lt;</div>
+    <div id="panelWrap" style="width:0px;position:absolute;top:0px;right:0px;height:100%;overflow:auto;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;">
+        <div style="width:20px;height:200px;margin:-100px 0 0 -10px;color:#999;position:absolute;opacity:0.5;top:50%;left:50%;">此处用于展示结果面板</div>
+        <div id="panel" style="position:absolute;"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var map = new BMap.Map('map');
+    var poi = new BMap.Point(116.307852, 40.057031);
+    map.centerAndZoom(poi, 13);
+    map.addControl(new BMap.NavigationControl());               // 添加平移缩放控件
+    //map.addControl(new BMap.ScaleControl());                    // 添加比例尺控件
+    map.addControl(new BMap.OverviewMapControl());              //添加缩略地图控件
+    map.addControl(new BMap.MapTypeControl({ mapTypes: [BMAP_NORMAL_MAP, BMAP_SATELLITE_MAP] })); //添加地图类型控件
+    map.enableScrollWheelZoom();
+    //==================全局变量================================
+    var searchInfoWindow = null;                    //信息框
+    var isRemove = 0;                               //是否移除版权标志
+    var currMarker;                                 //当前选中的标注
+    //===============设置本地城市为地图中心点====================
+    function myFun(result) {
+        var cityName = result.name;
+        map.setCenter(cityName);
+        map.setZoom(13);
+    }
+    function SetCity() { 
+        var myCity = new BMap.LocalCity();
+        myCity.get(myFun);
+    }
+    //===============创建右键菜单====================
+    function SetContextMenu() {
+        var contextMenu = new BMap.ContextMenu();
+        var txtMenuItem = [
+          {
+              text: '放大',
+              callback: function () { map.zoomIn() }
+          },
+          {
+              text: '缩小',
+              callback: function () { map.zoomOut() }
+          },
+          {
+              text: '放置到最大级',
+              callback: function () { map.setZoom(18) }
+          },
+          {
+              text: '查看全国',
+              callback: function () { map.setZoom(4) }
+          },
+          {
+              text: '在此添加标注',
+              callback: function (p) {
+                  cusorPio = p;
+                  var parm = p.lng + "_" + p.lat;
+                  window.external.ShowMarkerForm(parm);
+              }
+          }
+         ];
+        for (var i = 0; i < txtMenuItem.length; i++) {
+            contextMenu.addItem(new BMap.MenuItem(txtMenuItem[i].text, txtMenuItem[i].callback, 100));
+            if (i == 1 || i == 3) {
+                contextMenu.addSeparator();
+            }
+        }
+        map.addContextMenu(contextMenu);
+    }
+    //=======初始化标注=====================
+    function InitMarkers() { 
+        var points = window.external.GetAllMarkers();//从winform中获取标注点信息
+        var arrPoi = points.split(",");
+        for (var i = 0; i < arrPoi.length; i++) {
+            var point = new BMap.Point(arrPoi[i].split("_")[0], arrPoi[i].split("_")[1]); //获取经纬度
+            addMarker(point);
+        }
+    }
+    //====================设置中心====================================
+    function SetCenter(id, poi) {
+        var lng = poi.split("_")[0];
+        var lat = poi.split("_")[1];
+        var point1 = new BMap.Point(lng, lat);
+        map.centerAndZoom(point1, 13);
+    }
+    //==================增加标注=============================
+    function AddMarker(id, poi) {
+        var lng = poi.split("_")[0];
+        var lat = poi.split("_")[1];
+        var point1 = new BMap.Point(lng, lat);
+        addMarker(point1);
+        map.centerAndZoom(point1, 14);
+    }
+    function ModifyMarker(id, oldP, newP) {
+        var lng = newP.split("_")[0];
+        var lat = newP.split("_")[1];
+        var point1 = new BMap.Point(lng, lat);
+        currMarker.setPosition(point1);
+        GetInfoWin(currMarker);
+    }
+    //
+    function addMarker(point) {
+        var myIcon = new BMap.Icon("tax.gif", new BMap.Size(40, 34));               //设置标注图标
+        var marker = new BMap.Marker(point, { icon: myIcon });
+        marker.setZIndex(99);
+        map.addOverlay(marker);
+        marker.addEventListener("click", function () { GetInfoWin(this); });
+        return marker;
+    }
+    function ShowPanel() {
+//        isPanelShow = true;
+//        $("#showPanelBtn").style.right = "300px";
+//        $("#panelWrap").style.width = "300px";
+//        $("#map").style.marginRight = "300px";
+//        $("#showPanelBtn").innerHTML = "隐藏检索结果面板<br/>>";
+//        alert("请选中一个节点！");
+    }
+    //获取信息框
+    function GetInfoWin(marker) {
+        var point = marker.getPosition();
+        var info = window.external.GetMarkerInfo(point.lng + "_" + point.lat);
+        var name = info.split("##")[0];
+        var con = info.split("##")[1];
+        var con2 = info.split("##")[2];
+        var title = name + "<a class='modify' onclick='Modify(" + point.lng + "," + point.lat + ")' style='margin-left:10px;' lng=" + point.lng + "; lat=" + point.lat + " href=#>设置</a><a class='delete' onclick='Delete(" + point.lng + "," + point.lat + ")' style='margin-left:10px;' lng=" + point.lng + "; lat=" + point.lat + " href=#>删除</a>";
+        var content= GetContent({
+                title: name,
+                name: name,
+                content: con,
+                address: con2,
+                img: "tax2.png",
+                hasTasp:true
+            });
+        searchInfoWindow = new BMapLib.SearchInfoWindow(map, content, {
+            title: title,               //标题
+            width: 290,                 //宽度
+            height: 155,                //高度
+            panel: "panel",             //检索结果面板
+            enableAutoPan: true,        //自动平移
+            enableSendToPhone: false,
+            searchTypes: [
+            //				BMAPLIB_TAB_SEARCH,   //周边检索
+            //				BMAPLIB_TAB_TO_HERE,  //到这里去
+            //				BMAPLIB_TAB_FROM_HERE //从这里出发
+			]
+        });
+        searchInfoWindow.open(marker);
+        currMarker = marker;
+    }
+    //信息框模板
+    function GetContent(opts) {
+        this._opts = opts = opts || {};
+        this._opts.title = opts.title;
+        this._opts.name = opts.name;
+        this._opts.content = opts.content;
+        this._opts.address = opts.address;
+        this._opts.img = opts.img;
+        this.hasTasp = opts.hasTasp;
+        var template = '<div style="margin:0;line-height:20px;padding:2px;"><img src="' + this._opts.img + '" alt="" style="float:right;zoom:1;overflow:hidden;width:100px;height:100px;margin-left:3px;">名称：' + this._opts.name + '</div>';
+        template += '<div style="margin:0;line-height:20px;padding:2px;">内容：' + this._opts.content + '</div>';
+        template += '<div style="margin:0;line-height:20px;padding:2px;">地址：' + this._opts.address + '</div>';
+        if (this._opts.hasTasp == true) {
+            template += '<div style=" clear:both;margin:0;line-height:20px;padding:2px;"><ul><li><a class="tasp" style="color:Blue;" onclick="ShowWin()">地税考核系统</a></li></ul></div>';
+        }
+        var template1 = '<table>';
+        template1 += '<tr><td>';
+        template1 += this._opts.title;
+        template1 += '</td>';
+        template1 += '<td>';
+        template1 += '<div class="BMapLib_bubble_close" title="关闭" id="BMapLib_bubble_close' + this.guid + '">';
+        template1 += '</td></tr>';
+        template1 += '<tr><td>';
+        template1 += template;
+        template1 += '</td></tr>';
+        template1 += '</table>';
+        return template;
+    }
+    //调用winForm窗体
+    function ShowWin() {
+        var ss = window.external.ShowWindow();
+    }
+    //设置地图中心点
+    function SetCenter1(cityName) {
+        map.setCenter(cityName);
+        map.setZoom(13);
+    }
+    function Modify(lng, lat) {
+        var parm = lng + "_" + lat;
+        window.external.ModifyMarker(parm);
+    }
+    function Delete(lng, lat) {
+        var parm = lng + "_" + lat;
+        if (window.confirm('你确定要删除吗？')) {
+            var result = window.external.DeleteMarker(parm)
+            if (result == "1") {
+                map.removeOverlay(currMarker);
+                map.removeOverlay(searchInfoWindow);
+            } else {
+                alert("删除失败！");
+            }
+        } else {
+            return;
+        }
+    }
+
+    //=============去除地图版权信息=================
+    function RemoveRight() {
+        var copyRight = $('#map div.anchorBL');
+        if (isRemove == 0) {
+            setTimeout(function () {
+                if ($('#map div.anchorBL').length > 0) {
+                    $('#map div.anchorBL').remove();
+                    isRemove = 1;
+                }
+                else {
+                    RemoveRight();
+                }
+            }, 200);
+        }
+    }
+    $(function () {
+        //=====================加载======================================
+        SetCity();          //设置本地城市为地图中心点
+        SetContextMenu();   //创建右键菜单
+        InitMarkers();      //初始化标注点
+        RemoveRight();      //去除地图版权信息
+        //显示结果面板动作
+        $("#showPanelBtn").toggle(function () {
+            $("#showPanelBtn").css("right", "300px");
+            $("#panelWrap").css("width", "300px");
+            $("#map").css("marginRight", "300px");
+            $("#showPanelBtn").innerHTML = "隐藏检索结果面板<br/>>";
+        }, function () {
+            $("#showPanelBtn").css("right", "0px");
+            $("#panelWrap").css("width", "0px");
+            $("#map").css("marginRight", "0px");
+            $("#showPanelBtn").innerHTML = "显示检索结果面板<br/><";
+        });
+        $(".modify").click(function () {
+            alert();
+            var lng = $(this).attr("lng");
+            var lat = $(this).attr("lat");
+            var parm = lng + "_" + lat;
+            window.external.ShowMarkerForm(parm);
+        })
+    }); 
+</script>
+
+</body>
+</html>

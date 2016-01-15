@@ -1,0 +1,17 @@
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\bin\Debug\WpfBrowserApplication1.exe.manifest
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\bin\Debug\WpfBrowserApplication1.xbap
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\bin\Debug\WpfBrowserApplication1.exe
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\bin\Debug\WpfBrowserApplication1.pdb
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.csprojResolveAssemblyReference.cache
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\Page1.baml
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\Page1.g.cs
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\App.g.cs
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1_MarkupCompile.cache
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.g.resources
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.Properties.Resources.resources
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.csproj.GenerateResource.Cache
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.TrustInfo.xml
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.exe.manifest
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.xbap
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.exe
+C:\Users\J\Documents\Visual Studio 2013\Projects\WindowsFormsApplication1\WpfBrowserApplication1\obj\Debug\WpfBrowserApplication1.pdb
